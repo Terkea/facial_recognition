@@ -59,15 +59,41 @@ for features, label in training_data:
 training_images = np.array(training_images)
 training_images = training_images / 255.0
 
-model = keras.Sequential([
-    keras.layers.Flatten(input_shape=(77, 68)),
-    keras.layers.Dense(128, activation='relu'),
-    keras.layers.Dense(64, activation='relu'),
-    keras.layers.Dense(30)
-])
+def create_model():
+    model = keras.Sequential([
+        keras.layers.Flatten(input_shape=(77, 68)),
+        keras.layers.Dense(128, activation='relu'),
+        keras.layers.Dense(64, activation='relu'),
+        keras.layers.Dense(30)
+    ])
 
-model.compile(optimizer='adam',
-              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-              metrics=['accuracy'])
+    model.compile(optimizer='adam',
+                loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                metrics=['accuracy'])
 
-model.fit(x=np.array(training_images), y=np.array(training_labels), epochs=10)
+    return model
+
+def train_model(model):
+    checkpoint_path = "model/model.ckpt"
+    checkpoint_dir = os.getcwd()
+
+    # Create a callback that saves the model's weights
+    cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+                                                    save_weights_only=True,
+                                                    verbose=1)
+
+    # Train the model with the new callback
+    model.fit(x=np.array(training_images), 
+            y=np.array(training_labels),  
+            epochs=10,
+            validation_data=(np.array(training_images),np.array(training_labels)),
+            callbacks=[cp_callback])  # Pass callback to training
+
+train_model(create_model())
+# model.fit(x=np.array(training_images), y=np.array(training_labels), epochs=10)
+
+# Create a basic model instance
+model = create_model()
+
+# Display the model's architecture
+model.summary()
