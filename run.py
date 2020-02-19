@@ -57,6 +57,7 @@ for features, label in training_data:
     training_labels.append(label)
 
 training_images = np.array(training_images)
+training_images = training_images / 255.0
 
 model = keras.Sequential([
     keras.layers.Flatten(input_shape=(77, 68)),
