@@ -7,60 +7,61 @@ from tensorflow import keras
 # Helper libraries
 import os
 import cv2
+import shutil  
 from PIL import Image
 import pandas as pd
 from pandas import DataFrame
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import image
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten, Conv2D, MaxPooling2D
+
+def normalize_dataset():
+    for file in os.listdir("dataset"):
+        try:
+            os.mkdir(f"dataset/{file[5:7]}")
+            
+        except FileExistsError:
+            print("Directory ", file[5:7], " already exists")
+
+        shutil.move(os.getcwd() + f"/dataset/{file}", os.getcwd() + f"/dataset/{file[5:7]}/{file}")
 
 PATH = os.getcwd()
-DATADIR = PATH + "/dataset"
-BATCH = PATH + "/batch.csv"
+DATASET = os.path.join(PATH, "dataset")
+CATEGORIES = [folder for folder in os.listdir(DATASET)]
+INDEX_VALUES = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
 
-# indexing the pictures by their label
-def create_cvs():
-    files = [file for file in os.listdir(DATADIR)]
-    person = [file[5:7] for file in files]
+# normalize_dataset()
 
-    dataset = {'file': files,
-            'person': person
-            }
-    df = DataFrame(dataset, columns=['file', 'person'])
-    export_csv = df.to_csv('batch.csv', sep=',', encoding='utf-8', index=False)
+# print(img_array.shape)    =>  (77, 68)
 
-def display_image(number):
-    plt.figure()
-    plt.imshow(train_images[number])
-    plt.colorbar()
-    plt.grid(False)
-    plt.show()
+training_data = []
 
-def display_more_images():
-    plt.figure(figsize=(10,10))
-    for i in range(25):
-        plt.subplot(5,5,i+1)
-        plt.xticks([])
-        plt.yticks([])
-        plt.grid(False)
-        plt.imshow(train_images[i], cmap=plt.cm.binary)
-        plt.xlabel(train_labels[i])
-    plt.show()
+def create_training_data():
+    for category in CATEGORIES:
+        class_num = CATEGORIES.index(category)
+        new_path = os.path.join(DATASET, category)
+        for img in os.listdir(new_path):
+            img_array = cv2.imread(os.path.join(new_path, img), cv2.IMREAD_GRAYSCALE)
+            training_data.append([img_array, class_num])
 
 
-# loading the data for processing
-df = pd.read_csv(BATCH)
+create_training_data()
 
-train_images = [cv2.imread(DATADIR + f"/{image}", cv2.IMREAD_GRAYSCALE) for image in df['file']]
-train_images = np.asarray(train_images)
-train_images = train_images / 255.0
+training_images = []
+training_labels = []
 
-train_labels = df['person']
+for features, label in training_data:
+    training_images.append(features)
+    training_labels.append(label)
 
-# building the neuronal network
+training_images = np.array(training_images)
+
 model = keras.Sequential([
     keras.layers.Flatten(input_shape=(77, 68)),
     keras.layers.Dense(128, activation='relu'),
+    keras.layers.Dense(64, activation='relu'),
     keras.layers.Dense(30)
 ])
 
@@ -68,4 +69,4 @@ model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
 
-model.fit(train_images, train_labels, epochs=10)
+model.fit(x=np.array(training_images), y=np.array(training_labels), epochs=10)

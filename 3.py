@@ -1,0 +1,92 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+# # TensorFlow and tf.keras
+import tensorflow as tf
+from tensorflow import keras
+
+# Helper libraries
+import os
+import cv2
+import shutil  
+from PIL import Image
+import pandas as pd
+from pandas import DataFrame
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import image
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten, Conv2D, MaxPooling2D
+
+def normalize_dataset():
+    for file in os.listdir("dataset"):
+        try:
+            os.mkdir(f"dataset/{file[5:7]}")
+            
+        except FileExistsError:
+            print("Directory ", file[5:7], " already exists")
+
+        shutil.move(os.getcwd() + f"/dataset/{file}", os.getcwd() + f"/dataset/{file[5:7]}/{file}")
+
+PATH = os.getcwd()
+DATASET = os.path.join(PATH, "dataset")
+CATEGORIES = [folder for folder in os.listdir(DATASET)]
+INDEX_VALUES = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
+
+# normalize_dataset()
+
+# print(img_array.shape)    =>  (77, 68)
+
+training_data = []
+
+def create_training_data():
+    for category in CATEGORIES:
+        class_num = CATEGORIES.index(category)
+        new_path = os.path.join(DATASET, category)
+        for img in os.listdir(new_path):
+            img_array = cv2.imread(os.path.join(new_path, img), cv2.IMREAD_GRAYSCALE)
+            training_data.append([img_array, class_num])
+
+
+create_training_data()
+
+training_images = []
+training_labels = []
+
+for features, label in training_data:
+    training_images.append(features)
+    training_labels.append(label)
+
+training_images = np.asarray(training_images)
+
+model = keras.Sequential([
+    keras.layers.Flatten(input_shape=(77, 68)),
+    keras.layers.Dense(128, activation='relu'),
+    keras.layers.Dense(30)
+])
+
+model.compile(optimizer='adam',
+              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+              metrics=['accuracy'])
+
+model.fit(x=np.array(training_images), y=np.array(training_labels), epochs=10)
+
+
+
+# model = Sequential()
+# model.add(Conv2D(64, (3, 3), input_shape=(77,68)))
+# model.add(Activation("relu"))
+# model.add(MaxPooling2D(pool_size=(2, 2)))
+
+# model.add(Conv2D(64, (3, 3)))
+# model.add(Activation("relu"))
+# model.add(MaxPooling2D(pool_size=(2, 2)))
+
+# model.add(Flatten())
+# model.add(Dense(64))
+
+# model.add(Dense(1))
+# model.add(Activation("sigmoid"))
+
+# model.compile(loss="binary_crossentropy", optimizer="adam", metrics=['accuracy'])
+
+# model.fit(training_images, training_labels, batch_size=32, validation_split=0.1, epochs=10)
