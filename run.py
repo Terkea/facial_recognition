@@ -30,31 +30,24 @@ def normalize_dataset():
 PATH = os.getcwd()
 DATASET = os.path.join(PATH, "dataset")
 CATEGORIES = [folder for folder in os.listdir(DATASET)]
-INDEX_VALUES = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
+INDEX_VALUES = [i for i in range(30)]
 
 # normalize_dataset()
 
-# print(img_array.shape)    =>  (77, 68)
-
-training_data = []
-
 def create_training_data():
+    _images = []
+    _labels = []
+
     for category in CATEGORIES:
         class_num = CATEGORIES.index(category)
         new_path = os.path.join(DATASET, category)
         for img in os.listdir(new_path):
             img_array = cv2.imread(os.path.join(new_path, img), cv2.IMREAD_GRAYSCALE)
-            training_data.append([img_array, class_num])
+            _images.append(img_array)
+            _labels.append(class_num)
+    return (_images, _labels)
 
-
-create_training_data()
-
-training_images = []
-training_labels = []
-
-for features, label in training_data:
-    training_images.append(features)
-    training_labels.append(label)
+(training_images, training_labels) = create_training_data()
 
 training_images = np.array(training_images)
 training_images = training_images / 255.0
@@ -90,7 +83,6 @@ def train_model(model):
             callbacks=[cp_callback])  # Pass callback to training
 
 train_model(create_model())
-# model.fit(x=np.array(training_images), y=np.array(training_labels), epochs=10)
 
 # Create a basic model instance
 model = create_model()
