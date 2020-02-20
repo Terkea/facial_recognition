@@ -13,7 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import image
 
-
+# CONSTANTS
 PATH = os.getcwd()
 DATASET = os.path.join(PATH, "dataset")
 CATEGORIES = [folder for folder in os.listdir(DATASET)]
@@ -61,8 +61,6 @@ def create_model():
 # Create a callback that saves the model's weights
 def train_model(model):
     checkpoint_path = "model/model.ckpt"
-    checkpoint_dir = os.getcwd()
-
     
     cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
                                                     save_weights_only=True,
@@ -104,11 +102,11 @@ if __name__ == "__main__":
     training_images = np.array(training_images)
     training_images = training_images / 255.0
 
-    # create and train the model
+    print("create and train the model \n")
     train_model(create_model())
 
-    # info about the architecture
+    print("model architecture \n")
     model_architecture()
 
-    # reevaluate the saved model
+    print("reevaluation of the saved model \n")
     reevaluate_model()
