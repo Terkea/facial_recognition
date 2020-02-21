@@ -10,6 +10,7 @@ import os
 import cv2
 import shutil  
 import numpy as np
+import random
 import matplotlib.pyplot as plt
 from matplotlib import image
 
@@ -48,7 +49,6 @@ def create_model():
     model = keras.Sequential([
         keras.layers.Flatten(input_shape=(77, 68)),
         keras.layers.Dense(128, activation='relu'),
-        keras.layers.Dense(64, activation='relu'),
         keras.layers.Dense(30)
     ])
 
@@ -80,6 +80,14 @@ def model_architecture():
     model = train_model(create_model())
     model.summary()
 
+# Visualize the data
+def visualize_individual_picture():
+    plt.figure()
+    plt.imshow(training_images[0])
+    plt.colorbar()
+    plt.grid(False)
+    plt.show()
+
 def reevaluate_model():
     checkpoint_path = "model/model.ckpt"
     # Create a basic model instance
@@ -102,11 +110,13 @@ if __name__ == "__main__":
     training_images = np.array(training_images)
     training_images = training_images / 255.0
 
+    # visualize_random_pictures()
+
     print("create and train the model \n")
     train_model(create_model())
 
-    print("model architecture \n")
-    model_architecture()
+    # print("model architecture \n")
+    # model_architecture()
 
-    print("reevaluation of the saved model \n")
-    reevaluate_model()
+    # print("reevaluation of the saved model \n")
+    # reevaluate_model()
