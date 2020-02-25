@@ -4,6 +4,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import tensorflow as tf
 from tensorflow import keras
 tf.get_logger().setLevel('INFO')
+from sklearn.model_selection import train_test_split
 
 # Helper libraries
 import os
@@ -59,7 +60,7 @@ def create_model():
     return model
 
 # Create a callback that saves the model's weights
-def train_model(model):
+def train_model(model, train_data, train_labels):
     checkpoint_path = "model/model.ckpt"
     
     cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
@@ -70,7 +71,7 @@ def train_model(model):
     model.fit(x=np.array(training_images), 
             y=np.array(training_labels),  
             epochs=10,
-            validation_data=(np.array(training_images),np.array(training_labels)),
+            validation_data=(np.array(train_data),np.array(train_labels)),
             callbacks=[cp_callback])  # Pass callback to training
 
     return model
@@ -88,20 +89,20 @@ def visualize_individual_picture():
     plt.grid(False)
     plt.show()
 
-def reevaluate_model():
+def reevaluate_model(test_data, test_labels):
     checkpoint_path = "model/model.ckpt"
     # Create a basic model instance
     model = create_model()
 
     # Evaluate the model
-    loss, acc = model.evaluate(x=np.array(training_images),  y=np.array(training_labels), verbose=2)
+    loss, acc = model.evaluate(x=np.array(test_data),  y=np.array(test_labels), verbose=2)
     print("Untrained model, accuracy: {:5.2f}%".format(100 * acc))
 
     # Loads the weights
     model.load_weights(checkpoint_path)
 
     # Re-evaluate the model
-    loss,acc = model.evaluate(x=np.array(training_images),  y=np.array(training_labels), verbose=2)
+    loss,acc = model.evaluate(x=np.array(test_data),  y=np.array(test_labels), verbose=2)
     print("Restored model, accuracy: {:5.2f}%".format(100 * acc))
     
 
@@ -141,30 +142,35 @@ if __name__ == "__main__":
     training_images = np.array(training_images)
     training_images = training_images / 255.0
 
+    # spliting the data into train and test  
+    X_train, X_test, y_train, y_test = train_test_split(
+        training_images, training_labels, test_size=0.3, random_state=42)
+
     # visualize_random_pictures()
 
-    # print("create and train the model \n")
-    # train_model(create_model())
-
-    probability_model = tf.keras.Sequential([train_model(create_model()), 
-                                         tf.keras.layers.Softmax()])
-    
-    predictions = probability_model.predict(np.array(training_images))
-
-    num_rows = 5
-    num_cols = 10
-    num_images = num_rows*num_cols
-    plt.figure(figsize=(2*2*num_cols, 2*num_rows))
-    for i in range(num_images):
-        plt.subplot(num_rows, 2*num_cols, 2*i+1)
-        plot_image(1, predictions[1], training_labels, np.array(training_images))
-        plt.subplot(num_rows, 2*num_cols, 2*i+2)
-        plot_value_array(1, predictions[1], training_labels)
-    plt.tight_layout()
-    plt.show()
+    print("create and train the model \n")
+    train_model(create_model(), X_train, y_train)
 
     # print("model architecture \n")
     # model_architecture()
 
-    # print("reevaluation of the saved model \n")
-    # reevaluate_model()
+    print("reevaluation of the saved model \n")
+    reevaluate_model(X_test, y_test)
+
+    # benchmark 
+    # probability_model = tf.keras.Sequential([train_model(create_model()), 
+    #                                      tf.keras.layers.Softmax()])
+    
+    # predictions = probability_model.predict(np.array(training_images))
+
+    # num_rows = 5
+    # num_cols = 10
+    # num_images = num_rows*num_cols
+    # plt.figure(figsize=(2*2*num_cols, 2*num_rows))
+    # for i in range(num_images):
+    #     plt.subplot(num_rows, 2*num_cols, 2*i+1)
+    #     plot_image(1, predictions[1], training_labels, np.array(training_images))
+    #     plt.subplot(num_rows, 2*num_cols, 2*i+2)
+    #     plot_value_array(1, predictions[1], training_labels)
+    # plt.tight_layout()
+    # plt.show()
