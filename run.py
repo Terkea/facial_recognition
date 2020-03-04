@@ -76,11 +76,6 @@ def train_model(model, train_data, train_labels):
 
     return model
 
-# Display the model's architecture
-def model_architecture():
-    model = train_model(create_model())
-    model.summary()
-
 # Visualize the data
 def visualize_individual_picture():
     plt.figure()
@@ -142,7 +137,6 @@ if __name__ == "__main__":
     training_images = np.array(training_images)
     training_images = training_images / 255.0
 
-    # spliting the data into train and test  
     X_train, X_test, y_train, y_test = train_test_split(
         training_images, training_labels, test_size=0.3, random_state=42)
 
@@ -150,9 +144,6 @@ if __name__ == "__main__":
 
     print("create and train the model \n")
     train_model(create_model(), X_train, y_train)
-
-    # print("model architecture \n")
-    # model_architecture()
 
     print("reevaluation of the saved model \n")
     reevaluate_model(X_test, y_test)
