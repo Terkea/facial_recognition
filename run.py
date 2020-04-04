@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow import keras
-tf.get_logger().setLevel('INFO')
+# tf.get_logger().setLevel('INFO')
 from sklearn.model_selection import train_test_split
 
 import os
@@ -12,7 +12,7 @@ import datetime
 import matplotlib.pyplot as plt
 from matplotlib import image
 
-# memory fixi
+# memory fix
 config = tf.compat.v1.ConfigProto()
 config.gpu_options.allow_growth = True
 session = tf.compat.v1.Session(config=config)
@@ -48,7 +48,6 @@ def create_training_data():
 def create_model():
     model = keras.Sequential([
         keras.layers.Flatten(input_shape=(77, 68)),
-        keras.layers.Dense(128, activation='relu'),
         keras.layers.Dense(128, activation='relu'),
         keras.layers.Dense(30)
     ])
