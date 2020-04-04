@@ -45,9 +45,9 @@ X_train, X_test, y_train, y_test = train_test_split(
     training_images, training_labels, test_size=0.3, random_state=42)
 
 
-HP_NUM_UNITS = hp.HParam('num_units', hp.Discrete([1, 100]))
-HP_DROPOUT = hp.HParam('dropout', hp.RealInterval(0.1, 0.2))
-HP_OPTIMIZER = hp.HParam('optimizer', hp.Discrete(['adam', 'sgd']))
+HP_NUM_UNITS = hp.HParam('num_units', hp.Discrete([16, 32, 64, 128, 256]))
+HP_DROPOUT = hp.HParam('dropout', hp.RealInterval(0.1, 0.9))
+HP_OPTIMIZER = hp.HParam('optimizer', hp.Discrete(['Adadelta', 'Adagrad', 'Adam', 'Adamax', 'FTRL', 'NAdam', 'RMSprop', 'SGD']))
 
 METRIC_ACCURACY = 'accuracy'
 
@@ -64,7 +64,7 @@ def train_test_model(hparams):
     log_dir = "logs\\fit\\" \
     + "neurons-" + str(hparams[HP_NUM_UNITS]) + " " \
     + "dropout-" + str(hparams[HP_DROPOUT]) + " " \
-    + str(hparams[HP_OPTIMIZER]) + datetime.datetime.now().strftime("%Y%m%d-%H%M%S") + " " + \
+    + str(hparams[HP_OPTIMIZER]) + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir)
 
     model = tf.keras.models.Sequential([
