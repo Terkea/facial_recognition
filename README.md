@@ -13,6 +13,8 @@ As mentioned in the introduction the given dataset was already normalized, all t
 
 **Convolutional Neural Networks** operate in layers, where the front one, in this case, should have been a **Flatten layer**, which would have taken as an input the decimal value that results by multiplying the height and width (in pixels) of the training data but since the dataset provided was already uniformly resized to a resolution of 68 by 77 pixels this step was unnecessary. The lower the value the more accurate the neural network predictions are going to be which is why during the normalization process it is good practice to decrease the resolution of the files before any further processing and crop them to show merely the area of interest. 
 
+![gif](https://github.com/Terkea/facial_recognition/blob/master/values/1_oB3S5yHHhvougJkPXuc8og.gif)
+
 For the second layer, it was used a **Dense layer**, which was responsible for connecting each input to each output within its layer, also used as an **activation layer** with a **rectified linear unit also known as “RELU”** as an activation function, which has been extremely popular for the past few years and well known and appreciated for its performance in the detriment of Sigmoid or Tanh which on the other hand, involve expensive operations while learning. RELU learns faster and avoids the vanishing gradient problem, besides that, almost all deep learning networks use RELU nowadays, but only for the **hidden layers.**
 
 For the last layer, also known as the output layer, it was used another Dense layer which had 30 neurons, where the value of neurons came from the number of possible outputs, which in this case was 30.
@@ -62,7 +64,7 @@ One significant aspect that was forgotten about was that before sending the data
 
 This step was reproduced several times until it was determined their highest possible value. Due to using the object `“numpy.ndarray”`,  which is the object that is used for storing each photo as a dual dimensional array.
 
-(fig PCD 2)
+![img2](https://github.com/Terkea/facial_recognition/blob/master/values/1_IWUxuBpqn2VuV-7Ubr01ng.png)
 
 It was decided to divide the list by *255* to get results within `0 and 1` which are more comfortable to deal with. The importance of this step is crucial because it *directly affects accuracy.*
 
